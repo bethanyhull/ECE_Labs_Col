@@ -1,0 +1,23 @@
+#!/bin/bash
+
+RESOURCE=$1
+PROJ=$2
+
+mkdir -p			${PROJ}
+
+cp ${RESOURCE}/makefile		$PROJ
+cp ${RESOURCE}/makeopts		$PROJ
+cp ${RESOURCE}/debug-hw.gdb	$PROJ
+cp ${RESOURCE}/debug-sim.gdb	$PROJ
+mkdir -p 			$PROJ/src
+cp ${RESOURCE}/src/*		$PROJ/src/
+mkdir -p			$PROJ/startup
+cp ${RESOURCE}/startup/*	$PROJ/startup/
+sed -i "s/%PROJ/$PROJ/g"	$PROJ/makefile
+sed -i "s/%PROJ/$PROJ/g"	$PROJ/debug-sim.gdb
+sed -i "s/%PROJ/$PROJ/g"	$PROJ/debug-hw.gdb
+
+chmod -R 700 $PROJ/*
+chown -R `whoami` $PROJ/*
+
+echo Project: $PROJ created

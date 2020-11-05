@@ -39,7 +39,7 @@ int main(void)
   // int dig4 = ((var % .1) - (var % .01))/.01;
   // seg7_put (0x4, segData[dig4]); // HEX4 is hundredths of volts
 
-  int dig3 = (var - (var % 1000))/1000;
+  int dig3 = (val - (val % 1000))/1000;
   seg7_put (0x4, segData[dig3]);  // HEX3 is thousands digit of decimal ADC count                             
                                 
                                 // HEX2 is hundreds digit of decimal ADC count

@@ -42,7 +42,7 @@ int dig4 = ((val / 14) % 10);
   int dig3 = (val / 1000);
   seg7_put (0x3, segData[dig3]);  // HEX3 is thousands digit of decimal ADC count                             
                                 
-  int dig2 = (((val / 100) % 10);
+  int dig2 = ((val / 100) % 10);
   seg7_put (0x2, segData[dig2]); // HEX2 is hundreds digit of decimal ADC count
                                 
   int dig1 = ((val / 10) % 10);

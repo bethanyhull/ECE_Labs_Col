@@ -36,7 +36,7 @@ int main(void)
 int dig5 = ((val / 137) % 10);
   seg7_put (0x5, segData[dig5]);  // HEX5 is tenths of volts
 
-int dig4 = ((val / 14) % 10);
+int dig4 = (((val * 100) / 1366) % 10);
   seg7_put (0x4, segData[dig4]); // HEX4 is hundredths of volts
 
   int dig3 = (val / 1000);
@@ -48,7 +48,7 @@ int dig4 = ((val / 14) % 10);
   int dig1 = ((val / 10) % 10);
   seg7_put (0x1, segData[dig1]); // HEX1 is tens digit of decimal ADC count                              
                                 
-  int dig0 = (val % 10) 
+  int dig0 = (val % 10); 
   seg7_put (0x0, segData[dig0]); // HEX0 is ones digit of decimal ADC count                            
   }
 

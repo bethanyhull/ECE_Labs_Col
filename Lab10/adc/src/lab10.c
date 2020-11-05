@@ -1,5 +1,9 @@
 //"#include" statements for ADC and 7 segment function prototype declarations go here
 // gpio_d_init() prototype declaration goes here!
+#include "adc.h"
+#include "seg7.h"
+
+gpio_d_init();
 
 int main(void)
 {

@@ -7,9 +7,9 @@ void gpio_d_init(void);
 
 int main(void)
 {
-  adc_init(void);               // Initialize the ADC hardware
-  seg7_init (void);             // Initialize the 7 segment display
-  gpio_d_init(void);            // Initialize the GPIO Port D as outputs (output(15-0) = off)
+  adc_init();               // Initialize the ADC hardware
+  seg7_init ();             // Initialize the 7 segment display
+  gpio_d_init();            // Initialize the GPIO Port D as outputs (output(15-0) = off)
   unsigned char segData[16] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x2, 0x78, 0x00, 0x18, 0x08, 0x03, 0x46, 0x21, 0x06, 0x0e};                
                                 // set up array of 7 segment data to display decimal digits 
   while(1) {

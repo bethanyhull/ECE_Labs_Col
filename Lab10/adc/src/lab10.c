@@ -1,15 +1,16 @@
 //"#include" statements for ADC and 7 segment function prototype declarations go here
-// gpio_d_init() prototype declaration goes here!
 #include "adc.h"
 #include "seg7.h"
 
-gpio_d_init();
+// gpio_d_init() prototype declaration goes here!
+void gpio_d_init(void);
 
 int main(void)
 {
-                                // Initialize the ADC hardware
-                                // Initialize the 7 segment display
-                                // Initialize the GPIO Port D as outputs (output(15-0) = off)
+  adc_init(void);               // Initialize the ADC hardware
+  seg7_init (void);             // Initialize the 7 segment display
+  gpio_d_init(void);            // Initialize the GPIO Port D as outputs (output(15-0) = off)
+  unsigned char segData[16] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x2, 0x78, 0x00, 0x18, 0x08, 0x03, 0x46, 0x21, 0x06, 0x0e};                
                                 // set up array of 7 segment data to display decimal digits 
   while(1) {
     uint32_t q = 0;             // Initialize any variables needed
@@ -25,12 +26,18 @@ int main(void)
                                 // Use ADC value (0 - ???) to write 7 seg display
                                 
                                 // call seg7_put() for each digit in 7 segment display
-                               
+  double var = val * .000732421875                           
                                 
-                                // HEX7 is always blank
-                                // HEX6 is volts
-                                // HEX5 is tenths of volts
-                                // HEX4 is hundredths of volts
+  seg7_put (0x7, 0x00);  // HEX7 is always blank
+
+  int dig6 = ((var % 10) - (var % 1))
+  seg7_put (0x6, segData[dig6]));  // HEX6 is volts
+
+  int dig5 = ((var % 1) - (var % .1))/.1
+  seg7_put (0x5, segData[dig5]));  // HEX5 is tenths of volts
+
+    int dig4 = ((var % .1) - (var % .01))/.01
+  seg7_put (0x4, segData[dig4])); // HEX4 is hundredths of volts
                                 
                                 // HEX3 is thousands digit of decimal ADC count
                                 // HEX2 is hundreds digit of decimal ADC count

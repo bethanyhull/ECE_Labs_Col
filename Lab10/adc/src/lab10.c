@@ -30,25 +30,25 @@ int main(void)
                                 
   seg7_put (0x7, 0x00);  // HEX7 is always blank
 
-  int dig6 = floor(((val - (val % 1366)) / 1366) * .000732421875);
+  int dig6 = floor(val / 1366);
   seg7_put (0x6, segData[dig6]);  // HEX6 is volts
 
-int dig5 = floor((((val % 1366) - (val % 137)) / 137) * .000732421875);
+int dig5 = floor((val / 137) % 10);
   seg7_put (0x5, segData[dig5]);  // HEX5 is tenths of volts
 
-int dig4 = floor((((val % 137) - (val % 14)) / 14) * .000732421875);
+int dig4 = floor((val / 14) % 10);
   seg7_put (0x4, segData[dig4]); // HEX4 is hundredths of volts
 
-  int dig3 = (val - (val % 1000))/1000;
+  int dig3 = floor(val / 1000);
   seg7_put (0x3, segData[dig3]);  // HEX3 is thousands digit of decimal ADC count                             
                                 
-  int dig2 = ((val % 1000) - (val % 100))/100;
+  int dig2 = floor(((val / 100) % 10);
   seg7_put (0x2, segData[dig2]); // HEX2 is hundreds digit of decimal ADC count
                                 
-  int dig1 = ((val % 100) - (val % 10))/10;
+  int dig1 = floor((val / 10) % 10);
   seg7_put (0x1, segData[dig1]); // HEX1 is tens digit of decimal ADC count                              
                                 
-  int dig0 = ((val % 10) - (val % 1))/1;
+  int dig0 = floor(val % 10) 
   seg7_put (0x0, segData[dig0]); // HEX0 is ones digit of decimal ADC count                            
   }
 

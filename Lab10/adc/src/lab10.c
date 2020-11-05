@@ -40,13 +40,16 @@ int main(void)
   // seg7_put (0x4, segData[dig4]); // HEX4 is hundredths of volts
 
   int dig3 = (val - (val % 1000))/1000;
-  seg7_put (0x4, segData[dig3]);  // HEX3 is thousands digit of decimal ADC count                             
+  seg7_put (0x3, segData[dig3]);  // HEX3 is thousands digit of decimal ADC count                             
                                 
-                                // HEX2 is hundreds digit of decimal ADC count
-                                // HEX1 is tens digit of decimal ADC count
-                                // HEX0 is ones digit of decimal ADC count
+  int dig2 = ((val % 1000) - (val % 100))/100;
+  seg7_put (0x2, segData[dig2]); // HEX2 is hundreds digit of decimal ADC count
                                 
+  int dig1 = ((val % 100) - (val % 10))/10;
+  seg7_put (0x1, segData[dig1]); // HEX1 is tens digit of decimal ADC count                              
                                 
+  int dig0 = ((val % 10) - (val % 1))/1;
+  seg7_put (0x0, segData[dig0]); // HEX0 is ones digit of decimal ADC count                            
   }
 
   return 0;                     // main function always returns 0 to indicate success

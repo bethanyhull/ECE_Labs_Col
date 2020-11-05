@@ -26,7 +26,7 @@ int main(void)
                                 // Use ADC value (0 - ???) to write 7 seg display
                                 
                                 // call seg7_put() for each digit in 7 segment display
-  double var = val * .000732421875;                           
+                          
                                 
   seg7_put (0x7, 0x00);  // HEX7 is always blank
 

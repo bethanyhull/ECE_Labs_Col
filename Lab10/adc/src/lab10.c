@@ -30,14 +30,14 @@ int main(void)
                                 
   seg7_put (0x7, 0x00);  // HEX7 is always blank
 
-  int dig6 = ((var % 10) - (var % 1));
-  seg7_put (0x6, segData[dig6]));  // HEX6 is volts
+  int dig6 = ((var % 10.0) - (var % 1.0));
+  seg7_put (0x6, segData[dig6]);  // HEX6 is volts
 
   int dig5 = ((var % 1) - (var % .1))/.1;
-  seg7_put (0x5, segData[dig5]));  // HEX5 is tenths of volts
+  seg7_put (0x5, segData[dig5]);  // HEX5 is tenths of volts
 
     int dig4 = ((var % .1) - (var % .01))/.01;
-  seg7_put (0x4, segData[dig4])); // HEX4 is hundredths of volts
+  seg7_put (0x4, segData[dig4]); // HEX4 is hundredths of volts
                                 
                                 // HEX3 is thousands digit of decimal ADC count
                                 // HEX2 is hundreds digit of decimal ADC count

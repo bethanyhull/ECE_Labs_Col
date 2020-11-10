@@ -1,0 +1,349 @@
+   1              	// file: rcc.s
+   2              	
+   3              	   .syntax unified
+   4              	   .thumb
+   5              	
+   6              	   .include    "src/periph_regs.inc"
+   1              	# peripheral registers
+   2              	
+   3              	/* 
+   4              	 * stm32f407xx
+   5              	 * updated 11/04/2015
+   6              	 *
+   7              	 */
+   8              	
+   9              	/* 
+  10              	 *  PWR - Power Controller
+  11              	 *
+  12              	 *  DM00031020 - Section 5.6
+  13              	 */
+  14              	
+  15              	  .equ PWR_BASE,0x40007000
+  16              	
+  17              	    .equ PWR_CR,0x00			/* Power Control Register */
+  18              	
+  19              	      .equ PWR_CR_VOS,(1<<14)
+  20              		.equ PWR_CR_VOS_SCALE2,(0b0<<14)
+  21              		.equ PWR_CR_VOS_SCALE1,(0b1<<14)
+  22              		.equ PWR_CR_VOS_RESET,(0b1<<14)
+  23              	        .equ PWR_CR_VOS_DEFAULT,(0b1<<14)
+  24              	      .equ PWR_CR_FPDS,(1<<9)
+  25              	      .equ PWR_CR_DBP,(1<<8)
+  26              	      .equ PWR_CR_PLS,(~(~0<<3)<<5)
+  27              	      .equ PWR_CR_PVDE,(1<<4)
+  28              	      .equ PWR_CR_CSBF,(1<<3)
+  29              	      .equ PWR_CR_CWUF,(1<<2)
+  30              	      .equ PWR_CR_PDDS,(1<<1)
+  31              	      .equ PWR_CR_LPDS,(1<<0)
+  32              	
+  33              	    .equ PWR_CSR,0x04			/* Power Control/Status Register */
+  34              	
+  35              	      .equ PWR_CSR_VOSRDY,(1<<14)
+  36              	      .equ PWR_CSR_BRE,(1<<9)
+  37              	      .equ PWR_CSR_EWUP,(1<<8)
+  38              	      .equ PWR_CSR_BRR,(1<<3)
+  39              	      .equ PWR_CSR_PVDO,(1<<2)
+  40              	      .equ PWR_CSR_SBF,(1<<1)
+  41              	      .equ PWR_CSR_WUF,(1<<0)
+  42              	
+  43              	/* 
+  44              	 *  RCC - Reset and Clock Control
+  45              	 *
+  46              	 *  DM00031020 - Section 7
+  47              	 */
+  48              	      
+  49              	  .equ RCC_BASE,0x40023800
+  50              	  
+  51              	    .equ RCC_CR,0x00			/* Clock Control Register */
+  52              	
+  53              	      .equ RCC_CR_RESET,0x00000000
+  54              	      .equ RCC_CR_HSION,(1<<0)
+  55              	      .equ RCC_CR_HSIRDY,(1<<1)
+  56              	      .equ RCC_CR_HSEON,(1<<16)
+  57              	      .equ RCC_CR_HSERDY,(1<<17)
+  58              	      .equ RCC_CR_HSERDY_STARTUP_TIMEOUT,0x500
+  59              	      .equ RCC_CR_HSEBYP,(1<<18)
+  60              	      .equ RCC_CR_CSSON,(1<<19)
+  61              	      .equ RCC_CR_PLLON,(1<<24)
+  62              	      .equ RCC_CR_PLLRDY,(1<<25)
+  63              	
+  64              	    .equ PLL_M,8
+  65              	    .equ PLL_N,336
+  66              	    .equ PLL_P,2
+  67              	    .equ PLL_Q,7
+  68              	      
+  69              	    .equ RCC_PLLCFGR,0x04		/* PLL Configuration Register */
+  70              	
+  71              	      .equ RCC_PLLCFGR_RESET,0x24003010
+  72              	
+  73              	      .equ RCC_PLLCFGR_PLLQ,(~(~0<<4)<<24)
+  74              	
+  75              	        .equ RCC_PLLCFGR_PLLQ_VAL,(PLL_Q<<24)
+  76              	
+  77              	      .equ RCC_PLLCFGR_PLLP,(~(~0<<2)<<16)
+  78              	
+  79              	        .equ RCC_PLLCFGR_PLLP_VAL,(((PLL_P >> 1) -1)<<16)
+  80              	
+  81              	      .equ RCC_PLLCFGR_PLLN,(~(~0<<9)<<6)
+  82              	
+  83              	        .equ RCC_PLLCFGR_PLLN_VAL,(PLL_N<<6)
+  84              	
+  85              	      .equ RCC_PLLCFGR_PLLM,(~(~0<<6)<<0)
+  86              	
+  87              	        .equ RCC_PLLCFGR_PLLM_VAL,(PLL_M<<0)
+  88              	
+  89              	      .equ RCC_PLLCFGR_PLLSRC,(1<<22)
+  90              	
+  91              		.equ RCC_PLLCFGR_PLLSRC_HSI,(0<<22)
+  92              		.equ RCC_PLLCFGR_PLLSRC_HSE,(1<<22)
+  93              	
+  94              	      .equ RCC_PLLCFGR_HSE168,( RCC_PLLCFGR_PLLSRC_HSE | RCC_PLLCFGR_PLLQ_VAL | RCC_PLLCFGR_PLLP_VA
+  95              	
+  96              	    .equ RCC_CFGR,0x08			/* Clock Configuration Register */
+  97              	
+  98              	      .equ RCC_CFGR_MCO2,(~(~0<<2)<<30)
+  99              	
+ 100              		.equ RCC_CFGR_MCO2_SYSCLK,(0b00<<30)
+ 101              		.equ RCC_CFGR_MCO2_PLLI2S,(0b01<<30)
+ 102              		.equ RCC_CFGR_MCO2_HSE,   (0b10<<30)
+ 103              		.equ RCC_CFGR_MCO2_PLL,   (0b11<<30)
+ 104              	
+ 105              	      .equ RCC_CFGR_MCO2PRE,(~(~0<<3)<<27)
+ 106              	
+ 107              		.equ RCC_CFGR_MCO2PRE_NODIV,(0b0000<<27)
+ 108              	
+ 109              	      .equ RCC_CFGR_MCO1,(~(~0<<2)<<21)
+ 110              	
+ 111              		.equ RCC_CFGR_MCO1_HSI,(0b00<<21)
+ 112              		.equ RCC_CFGR_MCO1_LSE,(0b01<<21)
+ 113              		.equ RCC_CFGR_MCO1_HSE,(0b10<<21)
+ 114              		.equ RCC_CFGR_MCO1_PLL,(0b11<<21)
+ 115              	
+ 116              	      .equ RCC_CFGR_PPRE2,(~(~0<<3)<<13)
+ 117              	
+ 118              		.equ RCC_CFGR_PPRE2_DIV2,(0b100<<13)
+ 119              	
+ 120              	      .equ RCC_CFGR_PPRE1,(~(~0<<3)<<10)
+ 121              	
+ 122              		.equ RCC_CFGR_PPRE1_DIV4,(0b101<<10)
+ 123              	
+ 124              	      .equ RCC_CFGR_HPRE,(~(~0<<4)<<4)
+ 125              	
+ 126              		.equ RCC_CFGR_HPRE_DIV1,(0b0000<<4)
+ 127              	
+ 128              	      .equ RCC_CFGR_SWS,(~(~0<<2)<<2)
+ 129              	
+ 130              	        .equ RCC_CFGR_SWS_HSI,(0b00<<2)
+ 131              	        .equ RCC_CFGR_SWS_HSE,(0b01<<2)
+ 132              	        .equ RCC_CFGR_SWS_PLL,(0b10<<2)
+ 133              	
+ 134              	      .equ RCC_CFGR_SW,(~(~0<<2)<<0)
+ 135              	        .equ RCC_CFGR_SW_HSI,(0b00<<0)
+ 136              	        .equ RCC_CFGR_SW_HSE,(0b01<<0)
+ 137              	        .equ RCC_CFGR_SW_PLL,(0b10<<0)
+ 138              	
+ 139              	    .equ RCC_CIR,0x0c			/* Clock Interrupt Register */
+ 140              	      .equ RCC_CIR_RESET,0x00000000
+ 141              	
+ 142              	    .equ RCC_AHB1ENR,0x30		/* AHB1 peripheral clock enable register */
+ 143              	
+ 144              	      .equ RCC_AHB1ENR_GPIOA_EN,(1<<0)
+ 145              	      .equ RCC_AHB1ENR_GPIOB_EN,(1<<1)
+ 146              	      .equ RCC_AHB1ENR_GPIOC_EN,(1<<2)
+ 147              	      .equ RCC_AHB1ENR_GPIOD_EN,(1<<3)
+ 148              	      .equ RCC_AHB1ENR_GPIOE_EN,(1<<4)
+ 149              	
+ 150              	    .equ RCC_APB1ENR,0x40		/* APB1 peripheral clock enable register */
+ 151              	
+ 152              	      .equ RCC_APB1ENR_PWREN,(1<<28)    
+ 153              	
+ 154              	/* 
+ 155              	 *  FLASH - FLASH Interface Registers
+ 156              	 *
+ 157              	 *  DM00031020 - Section 3.9
+ 158              	 */
+ 159              	  
+ 160              	  .equ FLASH_BASE,0x08000000
+ 161              	
+ 162              	  .equ FLASH_R_BASE,0x40023c00
+ 163              	
+ 164              	    .equ FLASH_ACR,0x00			/* Access Control Register */
+ 165              	
+ 166              	      .equ FLASH_ACR_DCEN,(1<<10)
+ 167              	
+ 168              	        .equ FLASH_ACR_DCEN_DISABLE,(0b0<<10)
+ 169              	        .equ FLASH_ACR_DCEN_ENABLE,(0b1<<10)
+ 170              	
+ 171              	      .equ FLASH_ACR_ICEN,(1<<9)
+ 172              	
+ 173              	        .equ FLASH_ACR_ICEN_DISABLE,(0b0<<9)
+ 174              	        .equ FLASH_ACR_ICEN_ENABLE,(0b1<<9)
+ 175              	
+ 176              	      .equ FLASH_ACR_LATENCY,(~(~0<<3)<<0)
+ 177              	
+ 178              		.equ FLASH_ACR_LATENCY_0WS,(0b000<<0)
+ 179              		.equ FLASH_ACR_LATENCY_1WS,(0b001<<0)
+ 180              		.equ FLASH_ACR_LATENCY_2WS,(0b010<<0)
+ 181              		.equ FLASH_ACR_LATENCY_3WS,(0b011<<0)
+ 182              		.equ FLASH_ACR_LATENCY_4WS,(0b100<<0)
+ 183              		.equ FLASH_ACR_LATENCY_5WS,(0b101<<0)
+ 184              		.equ FLASH_ACR_LATENCY_6WS,(0b110<<0)
+ 185              		.equ FLASH_ACR_LATENCY_7WS,(0b111<<0)
+ 186              	
+ 187              	/* 
+ 188              	 *  SCB - System Control Block
+ 189              	 *
+ 190              	 *  DUI0553A - Section 3.9
+ 191              	 */
+ 192              	  
+ 193              	  .equ SCB_BASE,0xE000ED00
+ 194              	
+ 195              	    .equ SCB_VTOR,0x08			/* Vector Table Offset Register */
+ 196              	
+ 197              	      .equ VECT_TAB_OFFSET,0x00...
+   7              	        
+   8              	   .text
+   9              	
+  10              	   .align      2
+  11              	   .global     rcc_gpio_enable
+  12              	   .thumb_func
+  13              	   .type       rcc_gpio_enable, %function
+  14              	
+  15              	rcc_gpio_enable:
+  16              	
+  17 0000 4FF00403 	  mov r3,#4
+  18 0004 9842     	  cmp r0,r3
+  19 0006 08DC     	  bgt skip_enable
+  20              	    
+  21 0008 044B     	    ldr r3,=RCC_BASE
+  22 000a 196B     	    ldr r1,[r3, #RCC_AHB1ENR]
+  23 000c 4FF00102 	    mov r2,#1
+  24 0010 02FA00F2 	    lsl r2,r0
+  25 0014 41EA0201 	    orr r1,r2
+  26 0018 1963     	    str r1,[r3, RCC_AHB1ENR]
+  27              	
+  28              	  skip_enable:
+  29              	
+  30 001a 7047     	  bx lr
+  31 001c 00380240 	
+****  Warning:partial line at end of file ignored
+DEFINED SYMBOLS
+                            *ABS*:00000001 ctxm4
+./src/periph_regs.inc:15     *ABS*:40007000 PWR_BASE
+./src/periph_regs.inc:17     *ABS*:00000000 PWR_CR
+./src/periph_regs.inc:19     *ABS*:00004000 PWR_CR_VOS
+./src/periph_regs.inc:20     *ABS*:00000000 PWR_CR_VOS_SCALE2
+./src/periph_regs.inc:21     *ABS*:00004000 PWR_CR_VOS_SCALE1
+./src/periph_regs.inc:22     *ABS*:00004000 PWR_CR_VOS_RESET
+./src/periph_regs.inc:23     *ABS*:00004000 PWR_CR_VOS_DEFAULT
+./src/periph_regs.inc:24     *ABS*:00000200 PWR_CR_FPDS
+./src/periph_regs.inc:25     *ABS*:00000100 PWR_CR_DBP
+./src/periph_regs.inc:26     *ABS*:000000e0 PWR_CR_PLS
+./src/periph_regs.inc:27     *ABS*:00000010 PWR_CR_PVDE
+./src/periph_regs.inc:28     *ABS*:00000008 PWR_CR_CSBF
+./src/periph_regs.inc:29     *ABS*:00000004 PWR_CR_CWUF
+./src/periph_regs.inc:30     *ABS*:00000002 PWR_CR_PDDS
+./src/periph_regs.inc:31     *ABS*:00000001 PWR_CR_LPDS
+./src/periph_regs.inc:33     *ABS*:00000004 PWR_CSR
+./src/periph_regs.inc:35     *ABS*:00004000 PWR_CSR_VOSRDY
+./src/periph_regs.inc:36     *ABS*:00000200 PWR_CSR_BRE
+./src/periph_regs.inc:37     *ABS*:00000100 PWR_CSR_EWUP
+./src/periph_regs.inc:38     *ABS*:00000008 PWR_CSR_BRR
+./src/periph_regs.inc:39     *ABS*:00000004 PWR_CSR_PVDO
+./src/periph_regs.inc:40     *ABS*:00000002 PWR_CSR_SBF
+./src/periph_regs.inc:41     *ABS*:00000001 PWR_CSR_WUF
+./src/periph_regs.inc:49     *ABS*:40023800 RCC_BASE
+./src/periph_regs.inc:51     *ABS*:00000000 RCC_CR
+./src/periph_regs.inc:53     *ABS*:00000000 RCC_CR_RESET
+./src/periph_regs.inc:54     *ABS*:00000001 RCC_CR_HSION
+./src/periph_regs.inc:55     *ABS*:00000002 RCC_CR_HSIRDY
+./src/periph_regs.inc:56     *ABS*:00010000 RCC_CR_HSEON
+./src/periph_regs.inc:57     *ABS*:00020000 RCC_CR_HSERDY
+./src/periph_regs.inc:58     *ABS*:00000500 RCC_CR_HSERDY_STARTUP_TIMEOUT
+./src/periph_regs.inc:59     *ABS*:00040000 RCC_CR_HSEBYP
+./src/periph_regs.inc:60     *ABS*:00080000 RCC_CR_CSSON
+./src/periph_regs.inc:61     *ABS*:01000000 RCC_CR_PLLON
+./src/periph_regs.inc:62     *ABS*:02000000 RCC_CR_PLLRDY
+./src/periph_regs.inc:64     *ABS*:00000008 PLL_M
+./src/periph_regs.inc:65     *ABS*:00000150 PLL_N
+./src/periph_regs.inc:66     *ABS*:00000002 PLL_P
+./src/periph_regs.inc:67     *ABS*:00000007 PLL_Q
+./src/periph_regs.inc:69     *ABS*:00000004 RCC_PLLCFGR
+./src/periph_regs.inc:71     *ABS*:24003010 RCC_PLLCFGR_RESET
+./src/periph_regs.inc:73     *ABS*:0f000000 RCC_PLLCFGR_PLLQ
+./src/periph_regs.inc:75     *ABS*:07000000 RCC_PLLCFGR_PLLQ_VAL
+./src/periph_regs.inc:77     *ABS*:00030000 RCC_PLLCFGR_PLLP
+./src/periph_regs.inc:79     *ABS*:00000000 RCC_PLLCFGR_PLLP_VAL
+./src/periph_regs.inc:81     *ABS*:00007fc0 RCC_PLLCFGR_PLLN
+./src/periph_regs.inc:83     *ABS*:00005400 RCC_PLLCFGR_PLLN_VAL
+./src/periph_regs.inc:85     *ABS*:0000003f RCC_PLLCFGR_PLLM
+./src/periph_regs.inc:87     *ABS*:00000008 RCC_PLLCFGR_PLLM_VAL
+./src/periph_regs.inc:89     *ABS*:00400000 RCC_PLLCFGR_PLLSRC
+./src/periph_regs.inc:91     *ABS*:00000000 RCC_PLLCFGR_PLLSRC_HSI
+./src/periph_regs.inc:92     *ABS*:00400000 RCC_PLLCFGR_PLLSRC_HSE
+./src/periph_regs.inc:94     *ABS*:07405408 RCC_PLLCFGR_HSE168
+./src/periph_regs.inc:96     *ABS*:00000008 RCC_CFGR
+./src/periph_regs.inc:98     *ABS*:c0000000 RCC_CFGR_MCO2
+./src/periph_regs.inc:100    *ABS*:00000000 RCC_CFGR_MCO2_SYSCLK
+./src/periph_regs.inc:101    *ABS*:40000000 RCC_CFGR_MCO2_PLLI2S
+./src/periph_regs.inc:102    *ABS*:80000000 RCC_CFGR_MCO2_HSE
+./src/periph_regs.inc:103    *ABS*:c0000000 RCC_CFGR_MCO2_PLL
+./src/periph_regs.inc:105    *ABS*:38000000 RCC_CFGR_MCO2PRE
+./src/periph_regs.inc:107    *ABS*:00000000 RCC_CFGR_MCO2PRE_NODIV
+./src/periph_regs.inc:109    *ABS*:00600000 RCC_CFGR_MCO1
+./src/periph_regs.inc:111    *ABS*:00000000 RCC_CFGR_MCO1_HSI
+./src/periph_regs.inc:112    *ABS*:00200000 RCC_CFGR_MCO1_LSE
+./src/periph_regs.inc:113    *ABS*:00400000 RCC_CFGR_MCO1_HSE
+./src/periph_regs.inc:114    *ABS*:00600000 RCC_CFGR_MCO1_PLL
+./src/periph_regs.inc:116    *ABS*:0000e000 RCC_CFGR_PPRE2
+./src/periph_regs.inc:118    *ABS*:00008000 RCC_CFGR_PPRE2_DIV2
+./src/periph_regs.inc:120    *ABS*:00001c00 RCC_CFGR_PPRE1
+./src/periph_regs.inc:122    *ABS*:00001400 RCC_CFGR_PPRE1_DIV4
+./src/periph_regs.inc:124    *ABS*:000000f0 RCC_CFGR_HPRE
+./src/periph_regs.inc:126    *ABS*:00000000 RCC_CFGR_HPRE_DIV1
+./src/periph_regs.inc:128    *ABS*:0000000c RCC_CFGR_SWS
+./src/periph_regs.inc:130    *ABS*:00000000 RCC_CFGR_SWS_HSI
+./src/periph_regs.inc:131    *ABS*:00000004 RCC_CFGR_SWS_HSE
+./src/periph_regs.inc:132    *ABS*:00000008 RCC_CFGR_SWS_PLL
+./src/periph_regs.inc:134    *ABS*:00000003 RCC_CFGR_SW
+./src/periph_regs.inc:135    *ABS*:00000000 RCC_CFGR_SW_HSI
+./src/periph_regs.inc:136    *ABS*:00000001 RCC_CFGR_SW_HSE
+./src/periph_regs.inc:137    *ABS*:00000002 RCC_CFGR_SW_PLL
+./src/periph_regs.inc:139    *ABS*:0000000c RCC_CIR
+./src/periph_regs.inc:140    *ABS*:00000000 RCC_CIR_RESET
+./src/periph_regs.inc:142    *ABS*:00000030 RCC_AHB1ENR
+./src/periph_regs.inc:144    *ABS*:00000001 RCC_AHB1ENR_GPIOA_EN
+./src/periph_regs.inc:145    *ABS*:00000002 RCC_AHB1ENR_GPIOB_EN
+./src/periph_regs.inc:146    *ABS*:00000004 RCC_AHB1ENR_GPIOC_EN
+./src/periph_regs.inc:147    *ABS*:00000008 RCC_AHB1ENR_GPIOD_EN
+./src/periph_regs.inc:148    *ABS*:00000010 RCC_AHB1ENR_GPIOE_EN
+./src/periph_regs.inc:150    *ABS*:00000040 RCC_APB1ENR
+./src/periph_regs.inc:152    *ABS*:10000000 RCC_APB1ENR_PWREN
+./src/periph_regs.inc:160    *ABS*:08000000 FLASH_BASE
+./src/periph_regs.inc:162    *ABS*:40023c00 FLASH_R_BASE
+./src/periph_regs.inc:164    *ABS*:00000000 FLASH_ACR
+./src/periph_regs.inc:166    *ABS*:00000400 FLASH_ACR_DCEN
+./src/periph_regs.inc:168    *ABS*:00000000 FLASH_ACR_DCEN_DISABLE
+./src/periph_regs.inc:169    *ABS*:00000400 FLASH_ACR_DCEN_ENABLE
+./src/periph_regs.inc:171    *ABS*:00000200 FLASH_ACR_ICEN
+./src/periph_regs.inc:173    *ABS*:00000000 FLASH_ACR_ICEN_DISABLE
+./src/periph_regs.inc:174    *ABS*:00000200 FLASH_ACR_ICEN_ENABLE
+./src/periph_regs.inc:176    *ABS*:00000007 FLASH_ACR_LATENCY
+./src/periph_regs.inc:178    *ABS*:00000000 FLASH_ACR_LATENCY_0WS
+./src/periph_regs.inc:179    *ABS*:00000001 FLASH_ACR_LATENCY_1WS
+./src/periph_regs.inc:180    *ABS*:00000002 FLASH_ACR_LATENCY_2WS
+./src/periph_regs.inc:181    *ABS*:00000003 FLASH_ACR_LATENCY_3WS
+./src/periph_regs.inc:182    *ABS*:00000004 FLASH_ACR_LATENCY_4WS
+./src/periph_regs.inc:183    *ABS*:00000005 FLASH_ACR_LATENCY_5WS
+./src/periph_regs.inc:184    *ABS*:00000006 FLASH_ACR_LATENCY_6WS
+./src/periph_regs.inc:185    *ABS*:00000007 FLASH_ACR_LATENCY_7WS
+./src/periph_regs.inc:193    *ABS*:e000ed00 SCB_BASE
+./src/periph_regs.inc:195    *ABS*:00000008 SCB_VTOR
+./src/periph_regs.inc:197    *ABS*:00000000 VECT_TAB_OFFSET
+           src/rcc.s:10     .text:00000000 $t
+           src/rcc.s:15     .text:00000000 rcc_gpio_enable
+           src/rcc.s:28     .text:0000001a skip_enable
+           src/rcc.s:31     .text:0000001c $d
+                   .debug_aranges:0000000c $d
+
+NO UNDEFINED SYMBOLS

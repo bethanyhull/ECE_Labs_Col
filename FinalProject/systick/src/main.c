@@ -1,5 +1,5 @@
 /*
-* Author: Bethany Hull
+* Author: Daniel Bogden
 */
 
 #include "adc.h"
@@ -33,7 +33,6 @@ uint32_t val = 0;
 
 unsigned int switch1 = 0; //switch to change from auto (0) to manual (0)
 unsigned int switch2 = 0; //switch to change from left (0) to right  (0) in manual mode
-
 
 void servoSetup()
 {
@@ -82,11 +81,20 @@ int main()
     //isolate the bit 0 and 1 to get the value of switch 1 and 2 and set
     //them to the "switch1" and "switch2" variables respectively.
 
+    // seg_7put(0x06, <hex value for C>)
+
     /* This will continually grab the value of the voltage by the user if it is manual mode */
-    if (switch1 == 1) {
+    /*
+    * The next part also handles writing the the control to the 2 leftmost 7seg displays
+    * It will write AC for automatic and just C for manual
+    * 
+    if (switch1 == 1)
+    {
       val = adc_get();
     }
-    
+    else {
+      // seg7_put(0x7, <hex value for A>)
+    }
 
     /*
     * This will be the section that writes to the two servos. It will write no matter which mode.
@@ -97,16 +105,20 @@ int main()
     * PSEUDO Code
     * if (switch for x axis is on) {
     *     xAxisServo.write(volt_to_deg(val));
+    *     seg7_put(0x4, <hex for L>);
     * 
     *   }
     * 
     * if (switch for y axis is on) {
     *   yAxisServo.write(volt_to_deg(val));
+    *   *     seg7_put(0x5, <hex for U>);
     * }
     * 
     * if (switch for both is on) {
     *   xAxisServo.write(volt_to_deg(val));
     *   yAxisServo.write(volt_to_deg(val));
+    *   seg7_put(0x4, <hex for L>);
+    *   seg7_put(0x5, <hex for U>);
     * 
     */
 
@@ -117,6 +129,8 @@ int main()
     *   These values with be calculated with a mod to isolate the tens and ones digit.
     *   Each axis will use 2 LEDS to right 00 to 90
     *   These values will all be written in the code above.
+    * 
+    *   
     */
 
     continue;
@@ -135,29 +149,27 @@ void SysTick_Handler(void) //ISR - SysTick Interrupt Service Routine
   */
   // if (switch1 == 0)
   // {
-    // val = deg_to_volt(xAxisServo.read())
-    //   if (val >= 2095 - step_size) {
-    //     val -= step_size
-    //   }else {
-    //     val += step_size
-    //   }
-
-    
-    
+  // val = deg_to_volt(xAxisServo.read())
+  //   if (val >= 2095 - step_size) {
+  //     val -= step_size
+  //   }else {
+  //     val += step_size
+  //   }
   // }
-  
 }
 
-int volt_to_deg (int voltageValue) { // takes in a voltage value between 0 - 4095
-  double percent = voltageValue / 4095.0
-  double step = 180.0 / 100.0
-  int val = round((percent * step) - 90)
-return val
+int volt_to_deg(int voltageValue)
+{ // takes in a voltage value between 0 - 4095
+  double percent = voltageValue / 4095.0;
+  double step = 180.0 / 100.0;
+  int val = round((percent * step) - 90);
+  return val;
 }
 
-int deg_to_volt (int degreeValue) { // takes in a degree value between -90 and 90
-  double percent = (degreeValue + 90) / 180.0
-  double step = 4095.0 / 100.0
-  int val = round(percent * step)
-return val
+int deg_to_volt(int degreeValue)
+{ // takes in a degree value between -90 and 90
+  double percent = (degreeValue + 90) / 180.0;
+  double step = 4095.0 / 100.0;
+  int val = round(percent * step);
+  return val;
 }

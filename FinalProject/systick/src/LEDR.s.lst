@@ -1,0 +1,138 @@
+   1              	# file: LEDR.s
+   2              	# author: Daniel Bogden
+   3              	
+   4              	.include "macros.inc"
+   1              	# file: macros.inc
+   2              	
+  34              	  .list
+   5              	
+   6              	SET_TARGET
+   7              	
+   8              	 .text
+   9              	
+  10              	FUNCTION LEDR_Init,global
+  11              	
+  12 0000 00B5     	  push {lr}
+  13              	
+  14 0002 FFF7FEFF 	  bl gpio_d_init				// Initialize GPIO Port D as output
+  15              	  
+  16 0006 5DF804EB 	  pop {lr}
+  17              	
+  18 000a 7047     	  bx lr
+  19              	
+  20              	ENDFUNC LEDR_Init
+  21              	
+  22              	
+  23              	FUNCTION LEDR_Put_A,global
+  24              	
+  25 000c 00B5     	  push {lr}
+  26              	
+  27 000e 0146     	  mov r1,r0					      // save return argument from get RUN
+  28              	                          // previous values of LEDS in r1
+  29 0010 FFF7FEFF 	  bl gpio_d_get_current		// Target Register wiill be r0
+  30              	
+  31 0014 4FF00102 	  mov r2,#0b1             // create 1 bit mask (lsb)
+  32 0018 01EA0201 	  and r1,r2	      				// isolate new bit 12 (just in case)
+  33 001c 4FEA0121 	  lsl r1,#8				      	// de-normalize new bit 8
+  34 0020 4FEA0222 	  lsl r2,#8					      // de-normalize mask to bit 8					
+  35 0024 6FEA0202 	  mvn r2,r2        			  // invert mask for bit 12
+  36 0028 00EA0200 	  and r0,r2					      // clear tgarget bit 8
+  37 002c 40EA0100 	  orr r0,r1	      				// merge new bit 8 into Target
+  38              	
+  39 0030 FFF7FEFF 	  bl gpio_d_put				    // write Target Reg. r0 to Port D
+  40              	
+  41 0034 5DF804EB 	  pop {lr}
+  42              	
+  43 0038 7047     	  bx lr
+  44              	
+  45              	ENDFUNC LEDR_Put_A
+  46              	
+  47 003a 00BF     	FUNCTION LEDR_Put_B,global
+  48              	
+  49 003c 00B5     	  push {lr}
+  50              	
+  51 003e 0146     	  mov r1,r0
+  52              	
+  53 0040 FFF7FEFF 	  bl gpio_d_get_current
+  54              	
+  55 0044 084A     	  ldr r2,=#(~(~0<<4))             // Creating a 4 bit mask
+  56 0046 01EA0201 	  and r1,r2                       // and the mask in r2 and the argument that was stored in r1
+  57 004a 4FEA8101 	  lsl r1,#2                       // de-normalize bits of interest
+  58 004e 4FEA8202 	  lsl r2,#2                       // de-normalize mask
+  59 0052 6FEA0202 	  mvn r2,r2                       // mask inverse
+  60 0056 00EA0200 	  and r0,r2                       // bitwise AND the inverse mask and original argument
+  61 005a 40EA0100 	  orr r0,r1                       // bitwise OR the bits of interest and store in r0
+  62              	
+  63 005e FFF7FEFF 	  bl gpio_d_put
+  64              	
+  65 0062 5DF804EB 	  pop {lr}
+  66 0066 7047     	  bx lr
+  67              	
+  68 0068 0F000000 	ENDFUNC LEDR_Put_B
+  69              	
+  70              	// new
+  71              	FUNCTION led_put_index, global 
+  72              	  
+  73 006c 00B5     	  push {lr}
+  74              	  
+  75 006e 0146     	  mov r1,r0              //save return arguement from get_B (previous values of LED's) in r1
+  76              	  
+  77 0070 FFF7FEFF 	  bl gpio_d_get_current
+  78              	  
+  79 0074 084A     	  ldr r2,=#(~(~0<<3))   // 12-14 is 3 bit mask
+  80 0076 01EA0201 	  and r1,r2             // isolate new bits
+  81 007a 4FEA0131 	  lsl r1,#12             // shift mask left 12 bits to normalize
+  82 007e 4FEA0232 	  lsl r2,#12             // denormalize 3 bit mask to bits 12,13,14
+  83 0082 6FEA0202 	  mvn r2,r2             // invert mask
+  84 0086 00EA0200 	  and r0,r2             // clear target bits using inverse
+  85 008a 40EA0100 	  orr r0,r1             // merge new bits into target
+  86              	  
+  87 008e FFF7FEFF 	  bl gpio_d_put
+  88              	  
+  89 0092 5DF804EB 	  pop {lr}
+  90 0096 7047     	  bx lr
+  91              	
+  92 0098 07000000 	ENDFUNC led_put_index
+  93              	
+  94              	// new
+  95              	FUNCTION led_put_segments, global
+  96              	
+  97 009c 00B5     	  push {lr}
+  98 009e 0146     	  mov r1,r0              //save return arguement from get_B (previous values of LED's) in r1
+  99              	  
+ 100 00a0 FFF7FEFF 	  bl gpio_d_get_current
+ 101              	  
+ 102 00a4 064A     	  ldr r2,=#(~(~0<<7))   // 0-6 is 7 bit mask
+ 103 00a6 01EA0201 	  and r1,r2             // isolate new bits
+ 104              	                        // shift mask is not needed since numbers begin at 0
+ 105 00aa 6FEA0202 	  mvn r2,r2             // invert mask
+ 106 00ae 00EA0200 	  and r0,r2             // clear target bits using inverse
+ 107 00b2 40EA0100 	  orr r0,r1             // merge new bits into target
+ 108              	  
+ 109 00b6 FFF7FEFF 	  bl gpio_d_put
+ 110              	  
+ 111 00ba 5DF804EB 	  pop {lr}
+ 112 00be 7047     	  bx lr
+ 113              	  
+ 114 00c0 7F000000 	ENDFUNC led_put_segments
+ 115              	
+ 116              	.end
+DEFINED SYMBOLS
+                            *ABS*:00000001 ctxm4
+          src/LEDR.s:10     .text:00000000 LEDR_Init
+          src/LEDR.s:10     .text:00000000 $t
+          src/LEDR.s:23     .text:0000000c LEDR_Put_A
+          src/LEDR.s:47     .text:0000003c LEDR_Put_B
+          src/LEDR.s:68     .text:00000068 $d
+          src/LEDR.s:71     .text:0000006c led_put_index
+          src/LEDR.s:71     .text:0000006c $t
+          src/LEDR.s:92     .text:00000098 $d
+          src/LEDR.s:95     .text:0000009c led_put_segments
+          src/LEDR.s:95     .text:0000009c $t
+          src/LEDR.s:114    .text:000000c0 $d
+                   .debug_aranges:0000000c $d
+
+UNDEFINED SYMBOLS
+gpio_d_init
+gpio_d_get_current
+gpio_d_put

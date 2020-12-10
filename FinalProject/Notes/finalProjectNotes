@@ -1,0 +1,23 @@
+20ms cycle
+
+wake up 1000 times
+
+20/1000
+=> 20 microseconds reload time
+
+1/168 mhz
+
+5.96 nano seconds
+
+
+20x10^-6 / 5.96 * 10^-9   => Reload value
+
+(answer is the thousands)
+
+Manual Mode
+0v - 3v
+ 0 - 4095
+-90  +90
+50	100 isr calls
+
+turn the knob, set a global variable for isr calls

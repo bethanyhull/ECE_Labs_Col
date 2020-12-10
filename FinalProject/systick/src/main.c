@@ -9,6 +9,7 @@
 *                      the function write() takes in a degree in which you want it to adjust to.
 *                      the read() function will return a degree
 */
+#include <math.h>
 
 //Function Declarations
 void gpio_d_init(void);
@@ -23,11 +24,16 @@ unsigned int gpio_c_init(void);
 
 #define LEDs_ODR_Base (0x40020C14) /* LEDs Port D ODR Address */
 
+#define step_size 22.75
+
 unsigned int *pLEDs = (unsigned int *)LEDs_ODR_Base; /* Create pointer to Port D - ODR Reg */
 
 unsigned int counter = 1;
+uint32_t val = 0;
 
 unsigned int switch1 = 0; //switch to change from auto (0) to manual (0)
+unsigned int switch2 = 0; //switch to change from left (0) to right  (0) in manual mode
+
 
 void servoSetup()
 {
@@ -72,12 +78,15 @@ int main()
   */
   while (1)
   {
-    //get the value of switch 1 using the gpio_c_get function
-    //isolate the bit 0 to get the value of switch 1 and set
-    //it to the switch 1 variable
+    //get the value of switch 1 and switch 2 using the gpio_c_get function
+    //isolate the bit 0 and 1 to get the value of switch 1 and 2 and set
+    //them to the "switch1" and "switch2" variables respectively.
 
     /* This will continually grab the value of the voltage by the user if it is manual mode */
-    uint32_t val = adc_get();
+    if (switch1 == 1) {
+      val = adc_get();
+    }
+    
 
     /*
     * This will be the section that writes to the two servos. It will write no matter which mode.
@@ -124,4 +133,31 @@ void SysTick_Handler(void) //ISR - SysTick Interrupt Service Routine
   *  This next part will control
   * 
   */
+  // if (switch1 == 0)
+  // {
+    // val = deg_to_volt(xAxisServo.read())
+    //   if (val >= 2095 - step_size) {
+    //     val -= step_size
+    //   }else {
+    //     val += step_size
+    //   }
+
+    
+    
+  // }
+  
+}
+
+int volt_to_deg (int voltageValue) { // takes in a voltage value between 0 - 4095
+  double percent = voltageValue / 4095.0
+  double step = 180.0 / 100.0
+  int val = round((percent * step) - 90)
+return val
+}
+
+int deg_to_volt (int degreeValue) { // takes in a degree value between -90 and 90
+  double percent = (degreeValue + 90) / 180.0
+  double step = 4095.0 / 100.0
+  int val = round(percent * step)
+return val
 }
